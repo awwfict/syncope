@@ -5,7 +5,7 @@ from .decaf import decompose
 from .donut import log
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 
-bash = ThreadPoolExecutor(max_workers=4, thread_name_prefix="AMP")
+bash = ThreadPoolExecutor(max_workers=4, thread_name_prefix="syncopated")
 
 
 class smart:
