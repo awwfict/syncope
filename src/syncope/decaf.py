@@ -1,23 +1,33 @@
+import inspect
 import textwrap
 from functools import lru_cache
-#  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
-
-@lru_cache(maxsize=64)
-def getlines(path: str) -> tuple[str, ...]:
-    with open(path, "r", encoding="utf-8") as file:
-        return tuple(file.readlines())
-
+# ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 
 @lru_cache(maxsize=256)
-def decompose(path: str, startln: int, endln: int):
-    lines = getlines(path)
-    if startln > len(lines):
+def decompose(func):
+    try:
+        lines, _ = inspect.getsourcelines(func)
+        path = inspect.getsourcefile(func) or "<syncope>"
+    except (TypeError, OSError):
         return None
-    selected = lines[startln - 1 : endln]
-    clean = textwrap.dedent("".join(selected))
+
+    body = []
+    headerdone = False
+    for line in lines:
+        stripped = line.lstrip()
+        if not headerdone:
+            if stripped.startswith("def ") and stripped.rstrip().endswith(":"):
+                headerdone = True
+            continue
+        body.append(line)
+
+    if not body:
+        return None
+
+    clean = textwrap.dedent("".join(body))
     return compile(clean, path, "exec")
 
 
 def cleanertool() -> None:
-    getlines.cache_clear()
     decompose.cache_clear()
+
