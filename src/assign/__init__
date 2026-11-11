@@ -1,3 +1,0 @@
-from .locale import redirect
-
-__all__ = ["redirect"]
