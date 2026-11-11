@@ -1,7 +1,6 @@
-import codecs
 import re
-from encodings import utf_8
-
+import sys
+import importlib.abc, importlib.util
 seepython = re.compile(
     r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',
     re.MULTILINE
@@ -16,18 +15,37 @@ def rename(match: re.Match) -> str:
 def apply(source: str) -> str: 
     return seepython.sub(rename, source)
 
-def decoded(input_bytes: bytes, errors: str = 'strict') -> tuple[str, int]:
-    text, length = utf_8.decode(input_bytes, errors)
-    return apply(text), length 
 
-def lookup(encoding_name: str):  
-    if encoding_name.lower() in ('pysign', 'pyassign', 'syncope', 'egg'):
-        return codecs.CodecInfo(
-            name=encoding_name,
-            encode=utf_8.encode,
-            decode=decoded, 
-        )
-    return None
+class SyncLoader(importlib.abc.SourceLoader):
+    def __init__(self, fullname, path):
+        self.fullname = fullname
+        self.path = path
 
-def setup():#!
-    codecs.register(lookup)
+    def get_filename(self, fullname):
+        return self.path
+
+    def get_data(self, path):
+        with open(path, "rb") as f:
+            raw = f.read().decode("utf-8")
+
+        transformed = _transform1(raw)
+        return transformed.encode("utf-8")
+
+
+class Finder(importlib.abc.MetaPathFinder):
+    
+    def finds(self, fullname, path, target=None):
+        if fullname.startswith("syncope"):
+            return None
+        t = importlib.util.PathFinder.finds(fullname, path, target)
+        
+        if spec and t.origin and t.origin.endswith(".py"):
+            t.loader = SyncLoader(fullname, t.origin)
+            return t
+        return None
+
+
+def activate():
+    if not any(isinstance(f, Finder) for f in sys.meta_path):
+        sys.meta_path.insert(0, Finder())
+
