@@ -7,8 +7,8 @@ from .donut import log
 bash = ThreadPoolExecutor(max_workers=4, thread_name_prefix="syncopated")
 
 
-def desolate(fragment: str, action, startln: int, endln, caller) -> Future | None:
-    quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
+def desolate(fragment: str, action, target, caller) -> Future | None:
+
 
     if quickcheck() == 1: log.error(errs.msf3); return None
     else:
