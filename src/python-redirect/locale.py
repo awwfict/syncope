@@ -1,10 +1,7 @@
 import inspect
 import logging
 import textwrap
-from . import errs #error codes and mssgs
-
-log = logging.getLogger(__name__)
-log.addHandler(logging.NullHandler())
+from . import errs #errors and logger
 
 def redirect(startln: int, endln = None) -> None:
 
