@@ -1,14 +1,14 @@
-import re
-import sys
+import re, sys
 import importlib.abc, importlib.util
-seepython = re.compile(
-    r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',
-    re.MULTILINE
-)
+#  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
+seepython = re.compile(r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',re.MULTILINE)
+
 
 def rename(match: re.Match) -> str:
+
     indent, worker, action, startln, endln, tail = match.groups()
     cleansy = worker.strip().strip('"\'')
+
     if endln:
         return f'{indent}assign("{cleansy}", to={action}, at=({startln}, {endln})){tail}'
     return f'{indent}assign("{cleansy}", to={action}, at={startln}){tail}'
@@ -16,8 +16,10 @@ def rename(match: re.Match) -> str:
 
 def apply(source: str) -> str: 
     return seepython.sub(rename, source)
+#⠁⠂⠄⠄⠂⠁ ୨ৎ ⠁⠂⠄⠄⠂⠁
 
 
+#⠁⠂⠄⠄⠂⠁ ୨ৎ ⠁⠂⠄⠄⠂⠁⠁⠂⠄
 class SyncLoader(importlib.abc.SourceLoader):
     def __init__(self, fullname, path):
         self.fullname = fullname
