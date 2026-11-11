@@ -1,52 +1,68 @@
-import re, sys
-import importlib.abc, importlib.util
+import inspect
+from concurrent.futures import ThreadPoolExecutor, Future
+from . import errs
+from .decaf import decompose
+from .donut import log
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
-seepython = re.compile(r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',re.MULTILINE)
+bash = ThreadPoolExecutor(max_workers=4, thread_name_prefix="syncopated")
 
 
-def rename(match: re.Match) -> str:
+def desolate(fragment: str, action, startln: int, endln, caller) -> Future | None:
+    quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
 
-    indent, worker, action, startln, endln, tail = match.groups()
-    cleansy = worker.strip().strip('"\'')
+    if quickcheck() == 1: log.error(errs.msf3); return None
+    else:
+        quickcheck = lambda: 1 if not endln else 0
+        if quickcheck() == 1: endln = startln
+        quickcheck = lambda: 1 if type(endln) is not int or endln < 1 else 0
+        if quickcheck() == 1: endln = startln; log.warning(errs.mss22)
 
-    if endln:
-        return f'{indent}assign("{cleansy}", to={action}, at=({startln}, {endln})){tail}'
-    return f'{indent}assign("{cleansy}", to={action}, at={startln}){tail}'
-
-
-def apply(source: str) -> str: 
-    return seepython.sub(rename, source)
-#⠁⠂⠄⠄⠂⠁ ୨ৎ ⠁⠂⠄⠄⠂⠁
-
-
-#⠁⠂⠄⠄⠂⠁ ୨ৎ ⠁⠂⠄⠄⠂⠁⠁⠂⠄
-class SyncLoader(importlib.abc.SourceLoader):
-    def __init__(self, fullname, path):
-        self.fullname = fullname
-        self.path = path
-
-    def get_filename(self, fullname):
-        return self.path
-
-    def get_data(self, path):
-        with open(path, "rb") as f:
-            raw = f.read().decode("utf-8")
-
-        transformed = apply(raw)
-        return transformed.encode("utf-8")
-
-
-class SyncopeFinder(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path, target=None):
-        if fullname.startswith("syncope"): return None
-            
-        spec = importlib.util.PathFinder.find_spec(fullname, path, target)
-        if spec and spec.origin and spec.origin.endswith(".py"):
-            spec.loader = SyncopeLoader(fullname, spec.origin)
-            return spec
+    whereami = caller.f_code.co_filename
+    cut = decompose(whereami, startln, endln) #compiled script's part
+    if cut is None:
+        log.error(errs.msg4)
         return None
 
+    snapnow = dict(caller.f_globals) #snapshot of local params which exists inside all current file
+    locals = dict(caller.f_locals) #snapshot of all the elements directly in calling func
+    listexist = set(locals.keys()) #snapshot of params which exists before a cutted script's piece was creted
+    locals["_process__"] = fragment
 
-def activate():
-    if not any(isinstance(f, SyncopeFinder) for f in sys.meta_path):
-        sys.meta_path.insert(0, SyncopeFinder())
+    def todo():
+        if callable(action):
+            action()
+        exec(cut, snapnow, locals)
+        if "result" in locals and "result" not in listexist:
+            return locals["result"]
+        return {k: v for k, v in locals.items() if k != "_process__"}
+    return bash.submit(todo)
+
+
+def assign(target: str, to = None, at = None):
+    caller = inspect.stack()[1].frame
+
+    if isinstance(target, str) and " to " in target and " at " in target and to is None:
+        parts = target.split(" to ", 1)
+        process = parts[0].strip()
+        watchadoin, line_part = parts[1].rsplit(" at ", 1)
+        watchadoin = watchadoin.strip()
+        line_part = line_part.strip()
+
+        if ".." in line_part:
+            sets, sete = line_part.split("..", 1)
+            startlne = int(sets) if sets.strip().isdigit() else sets
+            endlne = int(sete) if sete.strip().isdigit() else sete
+        else:
+            startlne = int(line_part) if line_part.isdigit() else line_part
+            endlne = None
+
+        dodo = caller.f_locals.get(watchadoin) or caller.f_globals.get(watchadoin)
+        return desolate(process, dodo, startlne, endlne, caller)
+
+    if to is not None and at is not None:
+        if isinstance(at, tuple):
+
+            return desolate(target, to, at[0], at[1], caller)
+        return desolate(target, to, at, None, caller)
+    log.error(errs.msf3)
+    return None
