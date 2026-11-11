@@ -9,7 +9,7 @@ def getlines(path: str) -> tuple[str, ...]:
 
 
 @lru_cache(maxsize=256)
-def compose(path: str, startln: int, endln: int):
+def decompose(path: str, startln: int, endln: int):
     lines = getlines(path)
     if startln > len(lines):
         return None
