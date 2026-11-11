@@ -20,4 +20,4 @@ def decompose(path: str, startln: int, endln: int):
 
 def cleanertool() -> None:
     getlines.cache_clear()
-    compose.cache_clear()
+    decompose.cache_clear()
