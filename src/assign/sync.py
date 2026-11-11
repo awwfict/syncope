@@ -1,9 +1,9 @@
 import inspect, textwrap
-from  functools import lru_cache
 from concurrent.futures import ThreadPoolExecutor, Future
-from . import errs, donut
-from .errs import *
-from .donut import *
+from . import errs
+from .decaf import decompose
+from .donut import log, lockdown, unresponsed
+
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 def sign(startln: int, endln = None) -> None:
     quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
@@ -13,7 +13,7 @@ def sign(startln: int, endln = None) -> None:
         quickcheck = lambda: 1 if not endln else 0
         if quickcheck() == 1: endln = startln
         quickcheck = lambda: 1 if type(endln) is not int  or endln < 1 else 0
-        if quickcheck() == 1: endln = startln; log.warning()
+        if quickcheck() == 1: endln = startln; log.warning(errs.mss22)
     
     frame = inspect.stack()[1]
     whereami = frame.filename #current file
@@ -21,22 +21,22 @@ def sign(startln: int, endln = None) -> None:
     contain = frame.frame.f_globals #imports, scripts etc
     getlines = (whereami, startln)
     
+    with lockdown:
+        if getlines in unresponsed:
+            log.warning(errs.msg23)
+            return None
+        unresponded.add(getlines)
+
+    try:
+        code_obj = decompose(whereami, startln, endln)
+        if code_obj is None:
+            log.error(errs.msg4)
+            return None
+        exec(code_obj, contain, seen)
+        
+    finally:
         with lockdown:
-            if getlines in unresponded:
-                log.warning(errs.msg23)
-                return None
-            unresponded.add(getlines)
-    
-        try:
-            code_obj = decompose(whereami, startln, endln)
-            if code_obj is None:
-                log.error(errs.msg4)
-                return None
-            exec(code_obj, contain, seen)
-            
-        finally:
-            with lockdown:
-                unresponded.discard(getlines)
+            unresponded.discard(getlines)
     # with open(whereami, "r", encoding="utf-8") as file:
     #     ln = file.readlines()
 
