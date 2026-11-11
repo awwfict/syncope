@@ -4,6 +4,7 @@ import threading
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
+#  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 
 lockdown = threading.Lock()
-unresponse = set()
+unresponsed = set()
