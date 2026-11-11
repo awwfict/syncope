@@ -3,8 +3,8 @@ from concurrent.futures import ThreadPoolExecutor, Future
 from . import errs
 from .decaf import decompose
 from .donut import log, lockdown, unresponsed
-
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
+
 def sign(startln: int, endln = None) -> None:
     quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
 
