@@ -1,8 +1,9 @@
 import re, sys
 import importlib.abc, importlib.util
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
-seepython = re.compile(r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',re.MULTILINE)
-seesign = re.compile(r'^(\s*)sign(?:\s+at)?\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$', re.MULTILINE)
+seepython = re.compile(r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\w+)(.*)$',re.MULTILINE)
+seesign = re.compile(r'^(\s*)sign(?:\s+at)?\s+(\w+)(.*)$',re.MULTILINE)
+
 
 def rename(match: re.Match) -> str:
     indent, worker, action, startln, endln, tail = match.groups()
