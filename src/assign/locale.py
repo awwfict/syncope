@@ -19,13 +19,13 @@ def redirect(startln: int, endln = None) -> None:
     whereami = frame.filename #current file
     seen = frame.frame.f_locals #params inside the calling func
     contain = frame.frame.f_globals #imports, scripts etc
-    line_key = (whereami, startln)
+    getlines = (whereami, startln)
     
         with lockdown:
-            if line_key in unresponded:
+            if getlines in unresponded:
                 log.warning(errs.msr23)
                 return None
-            unresponded.add(line_key)
+            unresponded.add(getlines)
     
         try:
             code_obj = decompose(whereami, startln, endln)
@@ -36,7 +36,7 @@ def redirect(startln: int, endln = None) -> None:
             
         finally:
             with lockdown:
-                unresponded.discard(line_key)
+                unresponded.discard(getlines)
     # with open(whereami, "r", encoding="utf-8") as file:
     #     ln = file.readlines()
 
