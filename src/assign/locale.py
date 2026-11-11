@@ -1,5 +1,8 @@
-import inspect, textwrap
-from src.errs import *
+import inspect, textwrap, threading
+from  functools import lru_cache
+from concurrent.futures import ThreadPoolExecutor, Future
+from . import errs
+from errs import *
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 def redirect(startln: int, endln = None) -> None:
     quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
