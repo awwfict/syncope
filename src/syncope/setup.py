@@ -6,11 +6,13 @@ seepython = re.compile(
     re.MULTILINE
 )
 
-def rename(match: re.Match) -> str: 
+def rename(match: re.Match) -> str:
     indent, worker, action, startln, endln, tail = match.groups()
+    cleansy = worker.strip().strip('"\'')
     if endln:
-        return f"{indent}assign({worker}, to={action}, at=({startln}, {endln})){tail}"
-    return f"{indent}assign({worker}, to={action}, at={startln}){tail}"
+        return f'{indent}assign("{cleansy}", to={action}, at=({startln}, {endln})){tail}'
+    return f'{indent}assign("{cleansy}", to={action}, at={startln}){tail}'
+
 
 def apply(source: str) -> str: 
     return seepython.sub(rename, source)
@@ -28,24 +30,21 @@ class SyncLoader(importlib.abc.SourceLoader):
         with open(path, "rb") as f:
             raw = f.read().decode("utf-8")
 
-        transformed = _transform1(raw)
+        transformed = apply(raw)
         return transformed.encode("utf-8")
 
 
-class Finder(importlib.abc.MetaPathFinder):
-    
-    def finds(self, fullname, path, target=None):
-        if fullname.startswith("syncope"):
-            return None
-        t = importlib.util.PathFinder.finds(fullname, path, target)
-        
-        if spec and t.origin and t.origin.endswith(".py"):
-            t.loader = SyncLoader(fullname, t.origin)
-            return t
+class SyncopeFinder(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path, target=None):
+        if fullname.startswith("syncope"): return None
+            
+        spec = importlib.util.PathFinder.find_spec(fullname, path, target)
+        if spec and spec.origin and spec.origin.endswith(".py"):
+            spec.loader = SyncopeLoader(fullname, spec.origin)
+            return spec
         return None
 
 
 def activate():
-    if not any(isinstance(f, Finder) for f in sys.meta_path):
-        sys.meta_path.insert(0, Finder())
-
+    if not any(isinstance(f, SyncopeFinder) for f in sys.meta_path):
+        sys.meta_path.insert(0, SyncopeFinder())
