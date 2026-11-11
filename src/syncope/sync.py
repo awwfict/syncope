@@ -1,5 +1,4 @@
 import inspect, textwrap
-from concurrent.futures import ThreadPoolExecutor, Future
 from . import errs
 from .decaf import decompose
 from .donut import log, lockdown, unresponsed
@@ -37,9 +36,3 @@ def sign(startln: int, endln = None) -> None:
     finally:
         with lockdown:
             unresponsed.discard(getlines)
-    # with open(whereami, "r", encoding="utf-8") as file:
-    #     ln = file.readlines()
-
-    # selected = ln[startln - 1 : endln]
-    # clean = textwrap.dedent("".join(selected))
-    # exec(clean, contain, seen)
