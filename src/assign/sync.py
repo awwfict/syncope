@@ -23,14 +23,14 @@ def sign(startln: int, endln = None) -> None:
     
         with lockdown:
             if getlines in unresponded:
-                log.warning(errs.msr23)
+                log.warning(errs.msg23)
                 return None
             unresponded.add(getlines)
     
         try:
             code_obj = decompose(whereami, startln, endln)
             if code_obj is None:
-                log.error(errs.msr4)
+                log.error(errs.msg4)
                 return None
             exec(code_obj, contain, seen)
             
