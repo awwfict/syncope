@@ -2,20 +2,26 @@ import re, sys
 import importlib.abc, importlib.util
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 seepython = re.compile(r'^(\s*)assign\s+(.+?)\s+to\s+(.+?)\s+at\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$',re.MULTILINE)
-
+seesign = re.compile(r'^(\s*)sign(?:\s+at)?\s+(\d+)(?:(?:\.\.|-|\s*,\s*)(\d+))?(.*)$', re.MULTILINE)
 
 def rename(match: re.Match) -> str:
-
     indent, worker, action, startln, endln, tail = match.groups()
     cleansy = worker.strip().strip('"\'')
 
     if endln:
         return f'{indent}assign("{cleansy}", to={action}, at=({startln}, {endln})){tail}'
     return f'{indent}assign("{cleansy}", to={action}, at={startln}){tail}'
+    
+def rename_sign(match: re.Match) -> str:
+    indent, startln, endln, tail = match.groups()
+    if endln:
+        return f'{indent}sign({startln}, {endln}){tail}'
+    return f'{indent}sign({startln}){tail}'
 
 
-def apply(source: str) -> str: 
-    return seepython.sub(rename, source)
+def apply(source: str) -> str:
+    source = seepython.sub(rename, source)
+    return seesign.sub(rename_sign, source)
 #⠁⠂⠄⠄⠂⠁ ୨ৎ ⠁⠂⠄⠄⠂⠁
 
 
