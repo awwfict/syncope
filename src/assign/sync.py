@@ -25,7 +25,7 @@ def sign(startln: int, endln = None) -> None:
         if getlines in unresponsed:
             log.warning(errs.msg23)
             return None
-        unresponded.add(getlines)
+        unresponsed.add(getlines)
 
     try:
         code_obj = decompose(whereami, startln, endln)
@@ -36,7 +36,7 @@ def sign(startln: int, endln = None) -> None:
         
     finally:
         with lockdown:
-            unresponded.discard(getlines)
+            unresponsed.discard(getlines)
     # with open(whereami, "r", encoding="utf-8") as file:
     #     ln = file.readlines()
 
