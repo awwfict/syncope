@@ -1,8 +1,9 @@
-import inspect, textwrap, threading
+import inspect, textwrap
 from  functools import lru_cache
 from concurrent.futures import ThreadPoolExecutor, Future
-from . import errs
+from . import errs, donut
 from errs import *
+from donut import *
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 def redirect(startln: int, endln = None) -> None:
     quickcheck = lambda: 1 if not startln or type(startln) is not int or startln < 1 else 0
@@ -18,10 +19,27 @@ def redirect(startln: int, endln = None) -> None:
     whereami = frame.filename #current file
     seen = frame.frame.f_locals #params inside the calling func
     contain = frame.frame.f_globals #imports, scripts etc
+    line_key = (whereami, startln)
+    
+        with lockdown:
+            if line_key in unresponded:
+                log.warning(errs.msr23)
+                return None
+            unresponded.add(line_key)
+    
+        try:
+            code_obj = decompose(whereami, startln, endln)
+            if code_obj is None:
+                log.error(errs.msr4)
+                return None
+            exec(code_obj, contain, seen)
+            
+        finally:
+            with lockdown:
+                unresponded.discard(line_key)
+    # with open(whereami, "r", encoding="utf-8") as file:
+    #     ln = file.readlines()
 
-    with open(whereami, "r", encoding="utf-8") as file:
-        ln = file.readlines()
-
-    selected = ln[startln - 1 : endln]
-    clean = textwrap.dedent("".join(selected))
-    exec(clean, contain, seen)
+    # selected = ln[startln - 1 : endln]
+    # clean = textwrap.dedent("".join(selected))
+    # exec(clean, contain, seen)
