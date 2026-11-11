@@ -21,7 +21,7 @@ def decoded(input_bytes: bytes, errors: str = 'strict') -> tuple[str, int]:
     return apply(text), length 
 
 def lookup(encoding_name: str):  
-    if encoding_name.lower() in ('qawaii', 'py_redirect', 'redirect'):
+    if encoding_name.lower() in ('pysign', 'pyassign'):
         return codecs.CodecInfo(
             name=encoding_name,
             encode=utf_8.encode,
