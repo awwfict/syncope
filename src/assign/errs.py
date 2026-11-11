@@ -1,10 +1,3 @@
-import logging
-
-log = logging.getLogger(__name__)
-log.addHandler(logging.NullHandler())
-#  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
-
-
 #The first param's errors
 #  ⠁⠂⠄⠄⠂⠁୨ৎ ⠁⠂⠄⠄⠂⠁
 msf3 = 'Routing failed. The first parameter is missing or has an unsupported type.' # param is none, zero / not exists or has an unsupported type
